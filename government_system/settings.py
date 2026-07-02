@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+import certifi
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-uj&1ivkma-3sidqxg_%w6r((p@q&loo6wpoj*dv(o)u5b4qtak')
@@ -10,9 +10,12 @@ DEBUG = True
 
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://*.up.railway.app']
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.vercel.app',
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # حماية متقدمة (Security Hardening)
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
@@ -65,15 +68,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "government_system.wsgi.application"
 
+DATABASE_OPTIONS = {
+    'charset': 'utf8mb4',
+}
+
+if os.environ.get('MYSQL_SSL') == 'true':
+    DATABASE_OPTIONS['ssl'] = {
+        'ca': certifi.where(),
+    }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.environ.get('MYSQLDATABASE', 'injured_system_db'),
-        'USER': os.environ.get('MYSQLUSER', 'injured_user'),
-        'PASSWORD': os.environ.get('MYSQLPASSWORD', 'Injured@12345'),
+        'USER': os.environ.get('MYSQLUSER', 'root'),
+        'PASSWORD': os.environ.get('MYSQLPASSWORD', ''),
         'HOST': os.environ.get('MYSQLHOST', 'localhost'),
         'PORT': os.environ.get('MYSQLPORT', '3306'),
-        'OPTIONS': {'charset': 'utf8mb4'},
+        'OPTIONS': DATABASE_OPTIONS,
     }
 }
 
