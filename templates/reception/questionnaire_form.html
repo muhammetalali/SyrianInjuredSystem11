@@ -1,0 +1,29 @@
+{% extends 'reception/base.html' %}
+
+{% block content %}
+<h2>المرحلة الثالثة: استمارة البيانات الشخصية والعسكرية</h2>
+
+<div class="report-box">
+    يتم تعبئة هذه الاستمارة بعد قبول المصاب من اللجنة الطبية.
+    <br>
+    المصاب: <strong>{{ patient.first_name }} {{ patient.last_name }}</strong>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="form-grid">
+        {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <small style="color:red;">{{ field.errors }}</small>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="btn">حفظ الاستمارة</button>
+</form>
+{% endblock %}

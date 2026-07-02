@@ -1,0 +1,46 @@
+{% extends 'reception/base.html' %}
+
+{% block content %}
+<h2>تفاصيل ملف المصاب</h2>
+
+<div class="report-box">
+    <strong>الاسم:</strong> {{ patient.first_name }} {{ patient.last_name }}<br>
+    <strong>اسم الأب:</strong> {{ patient.father_name }}<br>
+    <strong>الرقم الذاتي:</strong> {{ patient.national_id }}<br>
+    <strong>الرقم العسكري:</strong> {{ patient.military_number }}<br>
+    <strong>الرتبة:</strong> {{ patient.rank }}<br>
+    <strong>الوحدة العسكرية:</strong> {{ patient.military_unit }}<br>
+    <strong>الحالة:</strong> {{ patient.get_status_display }}<br>
+    <strong>الحالة الصحية:</strong> {{ patient.health_condition }}<br>
+</div>
+
+{% if patient.medical_evaluation %}
+<h2>قرار اللجنة الطبية</h2>
+
+<div class="report-box">
+    {{ patient.medical_evaluation.decision_report }}
+</div>
+
+<div class="report-box">
+    <strong>الطبيب المسؤول:</strong> {{ patient.medical_evaluation.main_doctor_name }}<br>
+    <strong>الأطباء الحاضرون:</strong> {{ patient.medical_evaluation.committee_members }}<br>
+    <strong>التشخيص:</strong> {{ patient.medical_evaluation.diagnosis }}<br>
+    <strong>درجة الإصابة:</strong> {{ patient.medical_evaluation.injury_degree }}<br>
+    <strong>قرار اللجنة:</strong> {{ patient.medical_evaluation.get_decision_display }}<br>
+</div>
+{% endif %}
+
+{% if patient.questionnaire %}
+<h2>استمارة البيانات الشخصية</h2>
+
+<div class="report-box">
+    <strong>الإقامة الحالية:</strong> {{ patient.questionnaire.current_residence }}<br>
+    <strong>المستوى التعليمي:</strong> {{ patient.questionnaire.education_level }}<br>
+    <strong>المعارك أو المهام:</strong> {{ patient.questionnaire.participated_battles }}<br>
+    <strong>ظروف الإصابة:</strong> {{ patient.questionnaire.injury_circumstances }}<br>
+    <strong>نوع الدعم المطلوب:</strong> {{ patient.questionnaire.requested_support }}<br>
+</div>
+{% endif %}
+
+<a class="btn btn-secondary" href="{% url 'reception:dashboard' %}">عودة للرئيسية</a>
+{% endblock %}

@@ -1,0 +1,322 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نظام إدارة شؤون الجرحى</title>
+
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            margin: 0;
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        .top-bar {
+            background: #062f28;
+            color: white;
+            padding: 18px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 4px solid #a89568;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .logo-box {
+            width: 95px;
+            height: 95px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .top-bar h1 {
+            margin: 0;
+            font-size: 25px;
+            color: #ffffff;
+        }
+
+        .top-bar p {
+            margin: 6px 0 0;
+            font-size: 15px;
+            color: #d8c99b;
+        }
+
+        .nav {
+            background: #0b3d35;
+            padding: 12px 40px;
+            border-bottom: 1px solid #1f5a4f;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .nav a:hover {
+            color: #d8c99b;
+        }
+
+        .container {
+            width: 92%;
+            margin: 25px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            color: #062f28;
+            border-bottom: 2px solid #a89568;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+            color: #222;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #0b3d35;
+            box-shadow: 0 0 4px rgba(11, 61, 53, 0.3);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+        }
+
+        .form-check-input {
+            transform: scale(1.3);
+            margin-left: 8px;
+        }
+
+        .btn {
+            background: #062f28;
+            color: white;
+            padding: 11px 25px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        .btn:hover {
+            background: #0b3d35;
+        }
+
+        .btn-secondary {
+            background: #555;
+        }
+
+        .btn-secondary:hover {
+            background: #444;
+        }
+
+        .btn-danger {
+            background: #9b1c1c;
+        }
+
+        .btn-danger:hover {
+            background: #7f1515;
+        }
+
+        .btn-warning {
+            background: #b8860b;
+        }
+
+        .btn-warning:hover {
+            background: #9a7008;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 11px;
+            text-align: right;
+            vertical-align: top;
+        }
+
+        th {
+            background: #062f28;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        .card {
+            padding: 20px;
+            background: #f5f8f7;
+            border: 1px solid #d6e3df;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .card strong {
+            display: block;
+            font-size: 28px;
+            color: #062f28;
+            margin-bottom: 8px;
+        }
+
+        .message {
+            padding: 12px;
+            background: #dff0d8;
+            border: 1px solid #b6d7a8;
+            color: #255625;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        .report-box {
+            background: #f8f8f8;
+            border-right: 5px solid #a89568;
+            padding: 15px;
+            line-height: 1.9;
+            margin-top: 15px;
+            border-radius: 8px;
+        }
+
+        .footer {
+            width: 92%;
+            margin: 20px auto;
+            text-align: center;
+            color: #777;
+            font-size: 13px;
+            padding-bottom: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .form-grid,
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .top-bar {
+                padding: 15px;
+            }
+
+            .logo-box {
+                width: 75px;
+                height: 75px;
+            }
+
+            .top-bar h1 {
+                font-size: 20px;
+            }
+
+            .nav {
+                padding: 10px 15px;
+            }
+
+            .nav a {
+                display: inline-block;
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="top-bar">
+    <div class="logo-area">
+        <div class="logo-box">
+            <img src="{% static 'reception/images/logo.jpg' %}" alt="شعار الجهة">
+        </div>
+
+        <div>
+            <h1>مديرية شؤون الجرحى</h1>
+            <p>وزارة الدفاع - نظام استقبال وتقييم ومتابعة بيانات المصابين</p>
+        </div>
+    </div>
+</div>
+
+<div class="nav">
+    <a href="{% url 'reception:dashboard' %}">الرئيسية</a>
+    <a href="{% url 'reception:intake_create' %}">استقبال مصاب</a>
+    <a href="{% url 'reception:medical_queue' %}">التقييم الطبي</a>
+    <a href="{% url 'reception:accepted_list' %}">المقبولون</a>
+    <a href="{% url 'reception:suspended_list' %}">المعلّقون</a>
+    <a href="{% url 'reception:rejected_list' %}">المرفوضون</a>
+    <a href="/admin/">لوحة المدير</a>
+</div>
+
+<div class="container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+</div>
+
+<div class="footer">
+    نظام إدارة شؤون الجرحى - وزارة الدفاع
+</div>
+
+</body>
+</html>

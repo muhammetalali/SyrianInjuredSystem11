@@ -1,0 +1,38 @@
+{% extends 'reception/base.html' %}
+
+{% block content %}
+<h2>المرحلة الثانية: التقييم الطبي</h2>
+
+<div class="report-box">
+    <strong>بيانات المصاب:</strong><br>
+    الاسم: {{ patient.first_name }} {{ patient.last_name }}<br>
+    الرقم الذاتي: {{ patient.national_id }}<br>
+    الرقم العسكري: {{ patient.military_number }}<br>
+    الحالة الصحية: {{ patient.health_condition }}
+</div>
+
+<div class="report-box">
+    بناءً على التقييم الطبي، وبحضور الأطباء المعتمدين لدى وزارة الدفاع،
+    يتم اتخاذ أحد القرارات التالية بخصوص إصابة الأخ
+    <strong>{{ patient.first_name }} {{ patient.last_name }}</strong>:
+    قبول، رفض، أو تعليق.
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="form-grid">
+        {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <small style="color:red;">{{ field.errors }}</small>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="btn">حفظ قرار اللجنة الطبية</button>
+</form>
+{% endblock %}
