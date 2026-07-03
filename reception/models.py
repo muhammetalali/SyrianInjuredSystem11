@@ -174,3 +174,16 @@ class PersonalQuestionnaire(models.Model):
         super().save(*args, **kwargs)
         self.patient.status = 'QUESTIONNAIRE_COMPLETED'
         self.patient.save()
+class AuditLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    action = models.CharField(max_length=100)
+    path = models.CharField(max_length=255)
+    method = models.CharField(max_length=10)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user} - {self.action} - {self.created_at}"

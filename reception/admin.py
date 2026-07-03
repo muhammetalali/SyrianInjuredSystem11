@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import CommitteeDoctor, Patient, MedicalEvaluation, PersonalQuestionnaire
+from .models import AuditLog
 
 @admin.register(Patient)
 class PatientAdmin(admin.ModelAdmin):
@@ -25,3 +26,10 @@ class CommitteeDoctorAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'specialty', 'is_active', 'created_at')
     list_filter = ('is_active', 'specialty')
     search_fields = ('full_name', 'specialty')
+
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ('user', 'action', 'method', 'path', 'ip_address', 'created_at')
+    search_fields = ('user__username', 'action', 'path', 'ip_address')
+    list_filter = ('method', 'created_at')
