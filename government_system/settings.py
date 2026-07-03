@@ -7,6 +7,11 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 
 # تفعيل وضع التطوير المحلي
 DEBUG = os.environ.get("DEBUG", "False") == "True"
+ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS",
+    "127.0.0.1,localhost,.up.railway.app"
+).split(",")
+
 CSRF_TRUSTED_ORIGINS = os.environ.get(
     "CSRF_TRUSTED_ORIGINS",
     "https://*.up.railway.app"
