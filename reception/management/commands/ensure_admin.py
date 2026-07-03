@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 
 class Command(BaseCommand):
-    help = 'Create or update admin superuser from environment variables'
+    help = 'Create admin superuser only if it does not exist'
 
     def handle(self, *args, **options):
         username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
@@ -13,18 +13,14 @@ class Command(BaseCommand):
 
         User = get_user_model()
 
-        user, created = User.objects.get_or_create(
+        if User.objects.filter(username=username).exists():
+            self.stdout.write(self.style.SUCCESS(f'Admin already exists: {username}'))
+            return
+
+        User.objects.create_superuser(
             username=username,
-            defaults={'email': email}
+            email=email,
+            password=password
         )
 
-        user.email = email
-        user.is_staff = True
-        user.is_superuser = True
-        user.set_password(password)
-        user.save()
-
-        if created:
-            self.stdout.write(self.style.SUCCESS(f'Admin user created: {username}'))
-        else:
-            self.stdout.write(self.style.SUCCESS(f'Admin user updated: {username}'))
+        self.stdout.write(self.style.SUCCESS(f'Admin user created: {username}'))
