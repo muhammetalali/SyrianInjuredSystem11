@@ -1,8 +1,20 @@
 import os
 from pathlib import Path
 import dj_database_url
+import sentry_sdk
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+
+
+SENTRY_DSN = os.environ.get("SENTRY_DSN")
+
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        send_default_pii=True,
+        traces_sample_rate=0.1,
+    )
 SECRET_KEY = os.environ.get(
     "SECRET_KEY",
     "django-insecure-uj&1ivkma-3sidqxg_%w6r((p@q&loo6wpoj*dv(o)u5b4qtak"
