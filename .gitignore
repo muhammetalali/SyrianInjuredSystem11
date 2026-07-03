@@ -11,6 +11,7 @@ env/
 
 # Django
 db.sqlite3
+*.sqlite3-journal
 /staticfiles/
 media/
 *.log
@@ -20,6 +21,13 @@ media/
 
 # VS Code
 .vscode/
+
+# Test and tool caches
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 # OS
 .DS_Store
