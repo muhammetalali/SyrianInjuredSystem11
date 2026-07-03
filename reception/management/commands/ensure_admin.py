@@ -14,7 +14,9 @@ class Command(BaseCommand):
         User = get_user_model()
 
         if User.objects.filter(username=username).exists():
-            self.stdout.write(self.style.SUCCESS(f'Admin already exists: {username}'))
+            self.stdout.write(
+                self.style.SUCCESS(f'Admin already exists: {username}')
+            )
             return
 
         User.objects.create_superuser(
@@ -23,4 +25,6 @@ class Command(BaseCommand):
             password=password
         )
 
-        self.stdout.write(self.style.SUCCESS(f'Admin user created: {username}'))
+        self.stdout.write(
+            self.style.SUCCESS(f'Admin user created: {username}')
+        )
