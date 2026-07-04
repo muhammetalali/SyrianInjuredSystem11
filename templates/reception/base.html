@@ -4,8 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة شؤون الجرحى | وزارة الدفاع</title>
+    <title>مديرية شؤون الجرحى | وزارة الدفاع</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         :root {
             --primary-dark: #062f28; 
             --primary-gold: #a89568; 
@@ -16,10 +22,11 @@
 
         body {
             font-family: Tahoma, Arial, sans-serif;
-            margin: 0;
             background: var(--bg-light);
             color: var(--text-dark);
             line-height: 1.6;
+            width: 100%;
+            overflow-x: hidden;
         }
 
         /* Top Bar */
@@ -32,23 +39,39 @@
             justify-content: space-between;
             border-bottom: 4px solid var(--primary-gold);
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            flex-wrap: wrap; /* للتجاوب */
+            width: 100%;
         }
 
-        .logo-area { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; justify-content: center;}
+        .logo-area { 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+        }
+        
         .logo-box { width: 85px; height: 85px; background: transparent; }
         .logo-box img { width: 100%; height: 100%; object-fit: contain; }
         .top-bar h1 { margin: 0; font-size: 24px; font-weight: 700; }
         .top-bar p { margin: 5px 0 0; font-size: 14px; color: var(--primary-gold); }
 
-        /* Navigation */
+        /* زر القائمة الجانبية (مخفي في الديسكتوب) */
+        .hamburger-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary-gold);
+            font-size: 30px;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+
+        /* Navigation - Desktop */
         .nav {
             background: #041f1a;
             padding: 10px 40px;
             display: flex;
             gap: 25px;
-            flex-wrap: wrap; /* للتجاوب */
             align-items: center;
+            width: 100%;
         }
         .nav a {
             color: var(--white);
@@ -58,8 +81,8 @@
             transition: color 0.3s;
         }
         .nav a:hover { color: var(--primary-gold); }
-        .nav-right { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;}
-        .nav-left { margin-right: auto; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: center;}
+        .nav-right { display: flex; gap: 20px; }
+        .nav-left { margin-right: auto; display: flex; align-items: center; gap: 15px; }
         .nav-left span { color: var(--primary-gold); font-size: 13px;}
         .logout-form { display: inline; margin: 0; }
         .logout-button {
@@ -74,6 +97,10 @@
         }
         .logout-button:hover { color: var(--primary-gold); }
 
+        /* زر الإغلاق والطبقة المعتمة (مخفيان في الديسكتوب) */
+        .close-menu-btn { display: none; }
+        .menu-overlay { display: none; }
+
         /* Container & Forms */
         .container {
             width: 90%;
@@ -83,14 +110,13 @@
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            box-sizing: border-box;
         }
 
         h2 {
             color: var(--primary-dark);
             border-bottom: 2px solid var(--primary-gold);
             padding-bottom: 12px;
-            margin-top: 0;
+            margin-bottom: 20px;
             font-weight: 700;
         }
 
@@ -141,7 +167,7 @@
         label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
         .form-control {
             width: 100%; padding: 10px 12px; border: 1px solid #ccd1d1; border-radius: 5px;
-            box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; font-size: 14px;
+            font-family: Tahoma, Arial, sans-serif; font-size: 14px;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
         .form-control:focus {
@@ -160,7 +186,6 @@
         .btn-danger { background: #a93226; } .btn-danger:hover { background: #922b21; }
         .btn-warning { background: #d4ac0d; } .btn-warning:hover { background: #b7950b; }
 
-        /* Dashboard Cards Styling */
         .cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -183,7 +208,6 @@
             margin-bottom: 10px;
         }
 
-        /* Tables & Responsiveness */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -192,7 +216,7 @@
             border-radius: 5px;
             box-shadow: 0 0 5px rgba(0,0,0,0.02);
         }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 14px; margin-top: 0;}
+        table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 14px;}
         th, td { border: 1px solid #e5e8e8; padding: 12px; text-align: right; }
         th { background: var(--primary-dark); color: var(--white); font-weight: 600; }
         tr:nth-child(even) { background: #fcfcfc; }
@@ -213,29 +237,87 @@
         }
         .footer { text-align: center; color: #7f8c8d; font-size: 13px; padding: 20px; margin-top: 20px;}
 
-        /* --- Media Queries للموبايل والشاشات الصغيرة --- */
+        /* --- Media Queries (تصميم القائمة الجانبية للموبايل) --- */
         @media (max-width: 768px) {
-            .top-bar { flex-direction: column; text-align: center; padding: 15px 20px; }
-            .logo-area { flex-direction: column; text-align: center; }
-            .top-bar h1 { font-size: 20px; }
+            .top-bar { padding: 15px 20px; }
+            .logo-area { justify-content: flex-start; width: 100%; }
             
-            .nav { flex-direction: column; padding: 15px; gap: 15px; }
-            .nav-right { flex-direction: column; width: 100%; }
-            .nav-right a { 
+            /* إظهار أيقونة القائمة */
+            .hamburger-btn { display: block; }
+
+            /* تحويل شريط التنقل إلى قائمة جانبية */
+            .nav { 
+                position: fixed;
+                top: 0;
+                right: -280px; /* القائمة مخفية خارج الشاشة يميناً */
+                width: 280px;
+                height: 100vh;
+                background: #041f1a;
+                flex-direction: column;
+                align-items: stretch;
+                padding: 20px;
+                transition: right 0.3s ease-in-out;
+                z-index: 1000;
+                box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+                overflow-y: auto;
+            }
+
+            /* الفئة التي تضاف بواسطة الجافاسكريبت لفتح القائمة */
+            .nav.open { right: 0; }
+
+            /* زر الإغلاق داخل القائمة */
+            .close-menu-btn {
+                display: block;
+                background: none;
+                border: none;
+                color: var(--white);
+                font-size: 36px;
+                text-align: right;
+                cursor: pointer;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+
+            /* الطبقة المعتمة خلف القائمة */
+            .menu-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+                backdrop-filter: blur(2px); /* تأثير ضبابي اختياري */
+            }
+            .menu-overlay.active { display: block; }
+
+            .nav-right, .nav-left { flex-direction: column; width: 100%; gap: 10px; }
+            
+            .nav-right a, .nav-left a, .logout-button { 
                 display: block; 
                 background: rgba(255,255,255,0.05); 
-                padding: 10px; 
+                padding: 12px 15px; 
                 border-radius: 5px; 
-                text-align: center; 
+                text-align: right; 
+                width: 100%;
+                box-sizing: border-box;
             }
-            .nav-left { margin-right: 0; width: 100%; flex-direction: column; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+            .nav-left { margin-right: 0; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); gap: 10px;}
+            .nav-left span { padding: 0 10px; display: block; margin-bottom: 10px; }
+            .logout-form { width: 100%; }
+
+            .top-bar h1 { font-size: 18px; }
+            .top-bar p { font-size: 12px; }
+            .logo-box { width: 60px; height: 60px; }
             
             .container { width: 95%; padding: 15px; margin: 15px auto; }
             .document-pair { grid-template-columns: 1fr; gap: 10px; }
             .btn { display: block; width: 100%; margin-bottom: 10px; }
             .field-actions { flex-direction: column; width: 100%; }
             .field-actions .btn { width: 100%; }
-            
             .cards { grid-template-columns: 1fr; }
         }
     </style>
@@ -244,25 +326,33 @@
 
 <div class="top-bar">
     <div class="logo-area">
+        <button class="hamburger-btn" id="menuToggle" aria-label=" القائمة">
+            &#9776;
+        </button>
         <div class="logo-box">
             <img src="{% static 'reception/images/logo.jpg' %}" alt="وزارة الدفاع">
         </div>
         <div>
             <h1>وزارة الدفاع | مديرية شؤون الجرحى</h1>
-            <p>النظام المركزي الموحد لاستقبال وتقييم ومتابعة بيانات المصابين</p>
+            <p>نظام استقبال وتقييم ومتابعة بيانات الاخوة المصابين</p>
         </div>
     </div>
 </div>
 
-<div class="nav">
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<div class="nav" id="sideNav">
+    <button class="close-menu-btn" id="closeMenu">&times;</button>
+
     <div class="nav-right">
         <a href="{% url 'reception:dashboard' %}">الرئيسية</a>
-        <a href="{% url 'reception:intake_create' %}">استقبال مصاب</a>
+        <a href="{% url 'reception:intake_create' %}">انشاءطلب جديد</a>
         <a href="{% url 'reception:medical_queue' %}">التقييم الطبي</a>
         <a href="{% url 'reception:accepted_list' %}">المقبولون</a>
         <a href="{% url 'reception:suspended_list' %}">المعلّقون</a>
         <a href="{% url 'reception:rejected_list' %}">المرفوضون</a>
     </div>
+    
     <div class="nav-left">
         <span>مرحباً، {{ request.user.get_full_name|default:request.user.username }}</span>
         {% if request.user.is_superuser %}
@@ -286,8 +376,33 @@
 </div>
 
 <div class="footer">
-    جميع الحقوق محفوظة &copy; وزارة الدفاع - نظام إدارة شؤون الجرحى
+    جميع الحقوق محفوظة &copy; وزارة الدفاع - مديرية شؤون الجرحى
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.getElementById('menuToggle');
+        const closeMenu = document.getElementById('closeMenu');
+        const sideNav = document.getElementById('sideNav');
+        const overlay = document.getElementById('menuOverlay');
+
+        function toggleMenu() {
+            sideNav.classList.toggle('open');
+            overlay.classList.toggle('active');
+            
+            // منع التمرير في الصفحة الرئيسية عند فتح القائمة
+            if (sideNav.classList.contains('open')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        if (menuToggle) menuToggle.addEventListener('click', toggleMenu);
+        if (closeMenu) closeMenu.addEventListener('click', toggleMenu);
+        if (overlay) overlay.addEventListener('click', toggleMenu); // إغلاق عند النقر بالخارج
+    });
+</script>
 
 </body>
 </html>
