@@ -3,352 +3,415 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>طباعة استمارة المصاب</title>
-
+    <title>طباعة استمارة - {{ patient.full_name }}</title>
     <style>
+        /* إعدادات صفحة الطباعة */
         @page {
-            size: A4;
-            margin: 10mm;
+            size: A4 portrait;
+            margin: 1cm 1cm 3cm 1cm; 
         }
 
+        /* إجبار المتصفح على طباعة الألوان والخلفيات والمربعات بدقة */
         * {
-            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
-        html,
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background: #ffffff;
-            color: #000000;
-            font-family: Tahoma, Arial, sans-serif;
+            font-size: 14.5px;
+            color: #000;
+            background-color: #fff;
         }
 
-        body {
-            width: 210mm;
-            min-height: 297mm;
-        }
-
-        .no-print {
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        .btn-print {
-            background: #062f28;
-            color: #ffffff;
-            padding: 8px 25px;
-            border: none;
-            border-radius: 4px;
-            font-size: 15px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .print-container {
-            width: 190mm;
-            height: 277mm;
+        .container {
+            width: 100%;
+            max-width: 210mm;
             margin: 0 auto;
-            position: relative;
-            padding: 0;
+            box-sizing: border-box;
+            padding: 10px;
         }
 
-        .header-grid {
+        /* تنسيق الترويسة */
+        .header-flex {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 8mm;
-            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        
+        .header-right { 
+            text-align: right; 
+            line-height: 1.5; 
             font-weight: bold;
-        }
-
-        .header-right,
-        .header-left {
-            width: 34%;
-            line-height: 1.8;
-        }
-
-        .header-center {
-            width: 32%;
-            text-align: center;
-        }
-
-        .header-center img {
-            width: 22mm;
-            height: 22mm;
-            object-fit: contain;
-            margin-bottom: 2mm;
-        }
-
-        .main-title {
-            text-align: center;
-            font-size: 17px;
-            font-weight: bold;
-            margin: 4mm 0 6mm;
-            text-decoration: underline;
-        }
-
-        .top-checkboxes {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            font-size: 13px;
-            font-weight: bold;
-            margin-bottom: 6mm;
-        }
-
-        .top-checkboxes label {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        input[type="checkbox"] {
-            width: 13px;
-            height: 13px;
-        }
-
-        .section-title {
-            text-align: center;
             font-size: 14px;
-            font-weight: bold;
-            margin: 5mm 0 3mm;
-        }
-
-        .box-section {
-            border: 1px solid #000;
-            border-radius: 5px;
-            padding: 4mm;
-            margin-bottom: 4mm;
-        }
-
-        .field-row {
-            display: flex;
-            align-items: flex-end;
-            gap: 4mm;
-            margin-bottom: 4mm;
-            font-size: 12.5px;
-            font-weight: bold;
-        }
-
-        .field-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .field {
-            display: flex;
-            align-items: flex-end;
-            flex: 1;
-            min-width: 0;
-        }
-
-        .field.large {
-            flex: 2;
-        }
-
-        .field-label {
-            white-space: nowrap;
-            margin-left: 2mm;
-        }
-
-        .field-value {
-            display: block;
-            flex: 1;
-            border-bottom: 1.5px dotted #000;
-            min-height: 6mm;
-        }
-
-        .signature-area {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 50mm;
-            display: flex;
-            justify-content: space-between;
-            gap: 10mm;
-            text-align: center;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .signature-box {
             width: 30%;
         }
 
-        .signature-line {
-            height: 12mm;
-            border-bottom: 1.5px dotted #000;
-            margin-top: 5mm;
+        .header-center { 
+            text-align: center; 
+            width: 40%;
+        }
+        
+        .header-center img { 
+            width: 85px;
+            height: auto; 
+            margin-bottom: 2px;
+        }
+        
+        .header-center h4 { 
+            margin: 0; 
+            font-size: 13px; 
+            font-weight: bold;
+        }
+        
+        .header-center h5 { 
+            margin: 0; 
+            font-size: 9px; 
+            font-family: Arial, sans-serif;
+            letter-spacing: 1px;
         }
 
+        .header-left { 
+            text-align: right; 
+            line-height: 2;
+            font-size: 13px;
+            width: 30%;
+            direction: rtl;
+        }
+
+        /* تنسيقات عناصر الإدخال والنقاط */
+        .info-item {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .info-label {
+            white-space: nowrap;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+
+        .dotted-value {
+            flex-grow: 1;
+            border-bottom: 1.5px dotted #000;
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+            color: #1a1a1a;
+            padding-bottom: 2px;
+            min-height: 20px;
+        }
+
+        /* تنسيقات المربعات */
+        .checkbox-row {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+
+        .custom-box {
+            width: 14px; 
+            height: 14px; 
+            border: 1px solid #000; 
+            border-radius: 3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* شبكة المعلومات الشخصية */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px 20px;
+            margin-bottom: 20px;
+        }
+
+        .full-width-item {
+            grid-column: span 3;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        /* الإطارات والنطاقات */
+        .border-box {
+            border: 1px solid #000;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            background-color: transparent;
+        }
+
+        .border-box .info-item { 
+            margin-bottom: 14px; 
+        }
+        .border-box .info-item:last-child { 
+            margin-bottom: 0; 
+        }
+
+        .section-title-wrapper {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: -10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title-wrapper span {
+            background-color: #fff;
+            padding: 0 10px;
+        }
+
+        /* قسم العناوين الصحية */
+        .health-header {
+            display: flex; 
+            justify-content: space-around; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+            margin-top: 10px;
+        }
+
+        /* قسم التواقيع السفلي */
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+            text-align: center;
+            font-weight: bold;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+        
+        .signature-box {
+            width: 22%;
+        }
+
+        /* إخفاء الأزرار عند الطباعة */
         @media print {
-            .no-print {
-                display: none !important;
-            }
-
-            html,
-            body {
-                width: 210mm;
-                height: 297mm;
-                overflow: hidden;
-            }
-
-            .print-container {
-                page-break-after: avoid;
-                page-break-before: avoid;
-                page-break-inside: avoid;
-            }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
-
 <body>
-
-<div class="no-print">
-    <button class="btn-print" onclick="window.print()">طباعة الاستمارة</button>
-    <br>
-    <a href="{% url 'reception:dashboard' %}" style="display:inline-block; margin-top:8px; color:#062f28;">
-        العودة للرئيسية
-    </a>
-</div>
-
-<div class="print-container">
-
-    <div class="header-grid">
-        <div class="header-right">
-            الجمهورية العربية السورية<br>
-            وزارة الدفاع<br>
-            مديرية شؤون الجرحى
-        </div>
-
-        <div class="header-center">
-            <img src="{% static 'reception/images/logo.jpg' %}" alt="الشعار">
-        </div>
-
-        <div class="header-left" style="text-align:left;">
-            التاريخ:
-            <span style="display:inline-block; width:35mm; border-bottom:1.5px dotted #000;"></span>
-            <br>
-            الرقم التسلسلي:
-            <span style="display:inline-block; width:35mm; border-bottom:1.5px dotted #000;"></span>
-        </div>
+    
+    <div class="no-print" style="text-align: center; margin: 20px;">
+        <button onclick="window.print()" style="padding: 10px 30px; font-size: 16px; cursor: pointer; background-color: #062f28; color: white; border: none; border-radius: 5px; font-weight: bold;">طباعة الاستمارة</button>
+        <br><br>
+        <a href="{% url 'reception:dashboard' %}" style="color: #062f28; text-decoration: none; font-weight: bold;">العودة للرئيسية</a>
     </div>
 
-    <div class="main-title">
-        استمارة المصاب
+    <div class="container">
+        <div class="header-flex">
+            <div class="header-right">
+                الجمهورية العربية السورية<br>
+                وزارة الدفاع<br>
+                الإدارة العامة<br>
+                مديرية شؤون الجرحى
+            </div>
+            <div class="header-center">
+                <img src="{% static 'reception/images/logo.png' %}" alt="شعار وزارة الدفاع">
+                <h4>وزارة الدفاع</h4>
+                <h5>MINISTRY OF DEFENSE</h5>
+            </div>
+            <div class="header-left">
+                <div class="info-item">
+                    <span class="info-label">التاريخ:</span>
+                    <span class="dotted-value" style="direction: ltr;">
+                        {{ patient.created_at|date:"Y / m / d" }}
+                    </span>
+                </div>
+                <div class="info-item" style="margin-top: 10px;">
+                    <span class="info-label">الرقم التسلسلي</span>
+                    <span class="dotted-value">{{ patient.tracking_number|default_if_none:"" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="checkbox-row">
+            <div class="checkbox-item">
+                <span class="info-label">تقييم طبي</span>
+                <div class="custom-box">{% if patient.is_medical_evaluation %}✔{% endif %}</div>
+            </div>
+            <div class="checkbox-item">
+                <span class="info-label">مرسل وزارة</span>
+                <div class="custom-box">{% if patient.is_ministry_sent %}✔{% endif %}</div>
+            </div>
+            <div class="checkbox-item">
+                <span class="info-label">فصائل مندثرة</span>
+                <div class="custom-box">{% if patient.is_extinct_factions %}✔{% endif %}</div>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">الاسم الثلاثي</span>
+                <span class="dotted-value">{{ patient.full_name|default_if_none:"" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">اللقب</span>
+                <span class="dotted-value">{{ patient.nickname|default_if_none:"" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">رقم الهاتف</span>
+                <span class="dotted-value">{{ patient.phone|default_if_none:"" }}</span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">الرقم الذاتي</span>
+                <span class="dotted-value">{{ patient.national_id|default_if_none:"" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">تاريخ الميلاد</span>
+                <span class="dotted-value">{{ patient.date_of_birth|date:"Y-m-d" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">الفصيل المندثر</span>
+                <span class="dotted-value">{{ patient.extinct_faction_name|default_if_none:"" }}</span>
+            </div>
+
+            <div class="full-width-item">
+                <span class="info-label">السكن الحالي</span>
+                <span class="dotted-value">{{ patient.current_residence|default_if_none:"" }}</span>
+            </div>
+        </div>
+
+        <div class="health-header">
+            <div>المعلومات الصحية</div>
+            <div style="direction: ltr;">
+                تاريخ الإصابة &nbsp; 
+                {{ medical_evaluation.injury_date|date:"Y / m / d"|default:"&nbsp;&nbsp;&nbsp;&nbsp; / &nbsp;&nbsp;&nbsp;&nbsp; / &nbsp;&nbsp;&nbsp;&nbsp;" }}
+            </div>
+        </div>
+        <div class="border-box">
+            <div class="info-item">
+                <span class="info-label">نوع الإصابة</span>
+                <span class="dotted-value">{{ medical_evaluation.injury_type|default_if_none:"" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">فئة الإصابة</span>
+                <span class="dotted-value">{{ medical_evaluation.injury_category|default_if_none:"" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">تفاصيل الإصابة</span>
+                <span class="dotted-value">{{ medical_evaluation.injury_details|default_if_none:"" }}</span>
+            </div>
+            <div class="info-item" style="margin-top: 14px;">
+                <span class="dotted-value"></span>
+            </div>
+        </div>
+
+        <div class="border-box">
+            <div class="info-item">
+                <span class="info-label">نوع الإصابة المعتبرة</span>
+                <span class="dotted-value">{{ medical_evaluation.considered_injury_type|default_if_none:"" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">فئة الإصابة المعتبرة</span>
+                <span class="dotted-value">{{ medical_evaluation.considered_injury_category|default_if_none:"" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">سبب ومكان الإصابة</span>
+                <span class="dotted-value">{{ medical_evaluation.cause_and_location|default_if_none:"" }}</span>
+            </div>
+            
+            <div class="info-item" style="justify-content: space-between; margin-top: 15px;">
+                <div style="display: flex; flex-grow: 1; align-items: flex-end;">
+                    <span class="info-label">اسم وتوقيع عضو اللجنة الطبية</span>
+                    <span class="dotted-value" style="margin-left: 20px;">{{ medical_evaluation.doctor_name|default_if_none:"" }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px; margin-right: 10px;">
+                    <span class="info-label">مستحق</span>
+                    <div class="checkbox-item">
+                        نعم <div class="custom-box">{% if medical_evaluation.is_eligible %}✔{% endif %}</div>
+                    </div>
+                    <div class="checkbox-item">
+                        لا <div class="custom-box">{% if medical_evaluation and not medical_evaluation.is_eligible %}✔{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title-wrapper"><span>التفعيل</span></div>
+        <div class="border-box">
+            <div style="display: flex; gap: 40px; align-items: flex-end;">
+                <div style="display: flex; align-items: center; gap: 20px; padding-bottom: 2px;">
+                    <span class="info-label">تفعيل الزامي</span>
+                    <div class="checkbox-item">
+                        نعم <div class="custom-box">{% if activation.is_mandatory %}✔{% endif %}</div>
+                    </div>
+                    <div class="checkbox-item">
+                        لا <div class="custom-box">{% if activation and not activation.is_mandatory %}✔{% endif %}</div>
+                    </div>
+                </div>
+                <div style="display: flex; flex-grow: 1; align-items: flex-end;">
+                    <span class="info-label">العمل الذي ترغب به</span>
+                    <span class="dotted-value">{{ activation.desired_work|default_if_none:"" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title-wrapper"><span>الإثباتات</span></div>
+        <div class="border-box">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div class="info-item">
+                    <span class="info-label">شاهد أول</span>
+                    <span class="dotted-value">{{ activation.witness_1_name|default_if_none:"" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">رقم الهاتف</span>
+                    <span class="dotted-value">{{ activation.witness_1_phone|default_if_none:"" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">الرقم الذاتي</span>
+                    <span class="dotted-value">{{ activation.witness_1_id|default_if_none:"" }}</span>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div class="info-item">
+                    <span class="info-label">شاهد ثاني</span>
+                    <span class="dotted-value">{{ activation.witness_2_name|default_if_none:"" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">رقم الهاتف</span>
+                    <span class="dotted-value">{{ activation.witness_2_phone|default_if_none:"" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">الرقم الذاتي</span>
+                    <span class="dotted-value">{{ activation.witness_2_id|default_if_none:"" }}</span>
+                </div>
+            </div>
+            
+            <div class="info-item"><span class="dotted-value"></span></div>
+        </div>
+
+        <div class="signatures">
+            <div class="signature-box">
+                اسم وتوقيع<br>عضو اللجنة الأول
+            </div>
+            <div class="signature-box">
+                اسم وتوقيع<br>عضو اللجنة الثاني
+            </div>
+            <div class="signature-box">
+                اسم وتوقيع<br>مدير المديرية
+            </div>
+            <div class="signature-box">
+                اسم وتوقيع<br>رئيس اللجنة
+            </div>
+        </div>
+
     </div>
-
-    <div class="top-checkboxes">
-        <label>
-            <input type="checkbox" disabled>
-            تقييم طبي
-        </label>
-
-        <label>
-            <input type="checkbox" disabled>
-            مرسل وزارة
-        </label>
-
-        <label>
-            <input type="checkbox" disabled>
-            فصائل مندثرة
-        </label>
-    </div>
-
-    <div class="section-title">بيانات المصاب</div>
-
-    <div class="box-section">
-        <div class="field-row">
-            <div class="field large">
-                <span class="field-label">الاسم الثلاثي:</span>
-                <span class="field-value"></span>
-            </div>
-
-            <div class="field">
-                <span class="field-label">اللقب:</span>
-                <span class="field-value"></span>
-            </div>
-        </div>
-
-        <div class="field-row">
-            <div class="field">
-                <span class="field-label">رقم الهاتف:</span>
-                <span class="field-value"></span>
-            </div>
-
-            <div class="field">
-                <span class="field-label">الرقم الذاتي:</span>
-                <span class="field-value"></span>
-            </div>
-
-            <div class="field">
-                <span class="field-label">تاريخ الميلاد:</span>
-                <span class="field-value"></span>
-            </div>
-        </div>
-
-        <div class="field-row">
-            <div class="field">
-                <span class="field-label">الفصيل المندثر:</span>
-                <span class="field-value"></span>
-            </div>
-
-            <div class="field large">
-                <span class="field-label">السكن الحالي:</span>
-                <span class="field-value"></span>
-            </div>
-        </div>
-    </div>
-
-    <div class="section-title">قسم التقييم الطبي / معلومات الإصابة</div>
-
-    <div class="box-section">
-        <div class="field-row">
-            <div class="field">
-                <span class="field-label">تاريخ الإصابة:</span>
-                <span class="field-value"></span>
-            </div>
-
-            <div class="field">
-                <span class="field-label">نوع الإصابة:</span>
-                <span class="field-value"></span>
-            </div>
-        </div>
-
-        <div class="field-row">
-            <div class="field">
-                <span class="field-label">فئة الإصابة:</span>
-                <span class="field-value"></span>
-            </div>
-
-            <div class="field large">
-                <span class="field-label">تفاصيل الإصابة:</span>
-                <span class="field-value"></span>
-            </div>
-        </div>
-    </div>
-
-    <div class="signature-area">
-        <div class="signature-box">
-            الاسم
-            <div class="signature-line"></div>
-            التوقيع
-        </div>
-
-        <div class="signature-box">
-            الاسم
-            <div class="signature-line"></div>
-            التوقيع
-        </div>
-
-        <div class="signature-box">
-            الاسم
-            <div class="signature-line"></div>
-            التوقيع
-        </div>
-    </div>
-
-</div>
-
 </body>
 </html>
