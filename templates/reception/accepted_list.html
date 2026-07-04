@@ -1,40 +1,65 @@
 {% extends 'reception/base.html' %}
 
 {% block content %}
-<h2>قاعدة بيانات المقبولين</h2>
+<h2>قائمة المقبولين</h2>
 
 <div class="table-responsive">
     <table>
         <thead>
             <tr>
-                <th>الاسم</th>
+                <th>رقم التتبع</th>
+                <th>الاسم الثلاثي</th>
                 <th>الرقم الذاتي</th>
-                <th>الرقم العسكري</th>
+                <th>رقم الهاتف</th>
+                <th>مستحق</th>
                 <th>الحالة</th>
                 <th>الإجراء</th>
             </tr>
         </thead>
+
         <tbody>
             {% for patient in patients %}
             <tr>
-                <td>{{ patient.first_name }} {{ patient.last_name }}</td>
-                <td>{{ patient.national_id }}</td>
-                <td>{{ patient.military_number }}</td>
-                <td>{{ patient.get_status_display }}</td>
                 <td>
-                    <a class="btn" href="{% url 'reception:patient_detail' patient.id %}">عرض</a>
-                    {% if patient.status == 'ACCEPTED' %}
-                        <a class="btn" href="{% url 'reception:questionnaire_create' patient.id %}">
-                            تعبئة الاستمارة
-                        </a>
+                    <span class="tracking-badge">
+                        {{ patient.tracking_number|default_if_none:"" }}
+                    </span>
+                </td>
+
+                <td>{{ patient.full_name|default_if_none:"" }}</td>
+                <td>{{ patient.national_id|default_if_none:"" }}</td>
+                <td>{{ patient.phone|default_if_none:"" }}</td>
+
+                <td>
+                    {% if patient.medical_evaluation %}
+                        {% if patient.medical_evaluation.is_eligible %}
+                            نعم
+                        {% else %}
+                            لا
+                        {% endif %}
+                    {% else %}
+                        
                     {% endif %}
+                </td>
+
+                <td>{{ patient.get_status_display }}</td>
+
+                <td>
+                    <a class="btn" href="{% url 'reception:patient_detail' patient.id %}">
+                        الاطلاع على البيانات
+                    </a>
+
+                    <a class="btn" href="{% url 'reception:print_report' patient.id %}">
+                        الطباعة
+                    </a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5">لا يوجد مقبولون حاليًا.</td>
+                <td colspan="7">لا توجد أسماء مقبولة حالياً.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-</div> {% endblock %}
+</div>
+{% endblock %}

@@ -1,110 +1,196 @@
 from django import forms
-from .models import CommitteeDoctor, Patient, MedicalEvaluation, PersonalQuestionnaire
+from .models import Patient, MedicalEvaluation, Activation
+
 
 class PatientIntakeForm(forms.ModelForm):
     class Meta:
         model = Patient
-        exclude = ['status', 'created_at', 'updated_at', 'tracking_number']
+        fields = [
+            'is_medical_evaluation',
+            'is_ministry_sent',
+            'is_extinct_factions',
+            'full_name',
+            'nickname',
+            'phone',
+            'national_id',
+            'date_of_birth',
+            'extinct_faction_name',
+            'current_residence',
+        ]
+
         widgets = {
-            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
-            'injury_date': forms.DateInput(attrs={'type': 'date'}),
-            'children_count': forms.NumberInput(attrs={'min': 0}),
-            'address': forms.Textarea(attrs={'rows': 3}),
-            'health_condition': forms.Textarea(attrs={'rows': 3}),
-            'previous_details': forms.Textarea(attrs={'rows': 3}),
-            'other_documents': forms.Textarea(attrs={'rows': 3}),
-            'reception_notes': forms.Textarea(attrs={'rows': 3}),
-            'identity_card_image': forms.ClearableFileInput(attrs={'accept': 'image/*'}),
-            'military_card_image': forms.ClearableFileInput(attrs={'accept': 'image/*'}),
-            'medical_report_image': forms.ClearableFileInput(attrs={'accept': 'image/*'}),
-            'injury_document_image': forms.ClearableFileInput(attrs={'accept': 'image/*'}),
+            'date_of_birth': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'maxlength': '10',
+                'placeholder': 'مثال: 0912345678',
+                'pattern': r'09[0-9]{8}',
+                'title': 'رقم الهاتف يجب أن يبدأ بـ 09 وأن يتكوّن من 10 خانات فقط',
+            }),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            if name == 'children_count':
-                field.required = False
-            if name in ['phone', 'companion_phone']:
-                field.widget.attrs.update({
-                    'pattern': r'09[0-9]{8}',
-                    'maxlength': '10',
-                    'placeholder': '09XXXXXXXX',
-                })
+
+        for field_name, field in self.fields.items():
             if isinstance(field.widget, forms.CheckboxInput):
+                field.required = False
                 field.widget.attrs.update({'class': 'form-check-input'})
             else:
+                field.required = True
                 field.widget.attrs.update({'class': 'form-control'})
 
-    def clean(self):
-        cleaned_data = super().clean()
-        if cleaned_data.get('social_status') != 'married':
-            cleaned_data['children_count'] = 0
-        return cleaned_data
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+
+        if not phone:
+            raise forms.ValidationError('رقم الهاتف مطلوب.')
+
+        if not phone.isdigit():
+            raise forms.ValidationError('رقم الهاتف يجب أن يحتوي على أرقام فقط.')
+
+        if not phone.startswith('09'):
+            raise forms.ValidationError('رقم الهاتف يجب أن يبدأ بـ 09.')
+
+        if len(phone) != 10:
+            raise forms.ValidationError('رقم الهاتف يجب أن يتكوّن من 10 خانات فقط.')
+
+        return phone
+
 
 class MedicalEvaluationForm(forms.ModelForm):
-    committee_doctors = forms.ModelMultipleChoiceField(
-        queryset=CommitteeDoctor.objects.none(),
+    is_eligible = forms.TypedChoiceField(
+        label='مستحق',
+        choices=(
+            ('True', 'نعم'),
+            ('False', 'لا'),
+        ),
+        coerce=lambda value: value == 'True',
+        widget=forms.RadioSelect,
         required=True,
-        widget=forms.CheckboxSelectMultiple,
-        label='الأطباء الحاضرون والمعتمدون',
-        error_messages={'required': 'يجب اختيار طبيب واحد على الأقل من أطباء اللجنة.'},
     )
 
     class Meta:
         model = MedicalEvaluation
-        # استبعاد الطبيب لأننا سنسنده برمجياً للمستخدم الحالي
-        exclude = ['patient', 'doctor', 'committee_members', 'created_at']
+        fields = [
+            'injury_date',
+            'injury_type',
+            'injury_category',
+            'injury_details',
+            'considered_injury_type',
+            'considered_injury_category',
+            'cause_and_location',
+            'is_eligible',
+            'doctor_name',
+        ]
+
         widgets = {
-            'diagnosis': forms.Textarea(attrs={'rows': 4}),
-            'medical_notes': forms.Textarea(attrs={'rows': 3}),
-            'decision_reason': forms.Textarea(attrs={'rows': 4}),
+            'injury_date': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+            }),
+            'injury_details': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+            }),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['committee_doctors'].queryset = CommitteeDoctor.objects.filter(is_active=True)
-        self.fields['decision_reason'].required = False
-        self.fields['decision_reason'].label = 'سبب القرار / سبب رفض الإحالة'
-        for name, field in self.fields.items():
-            if isinstance(field.widget, forms.CheckboxSelectMultiple):
-                field.widget.attrs.update({'class': 'checkbox-list'})
+
+        for field_name, field in self.fields.items():
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.required = False
+                field.widget.attrs.update({'class': 'form-check-input'})
+            elif isinstance(field.widget, forms.RadioSelect):
+                field.widget.attrs.update({'class': 'radio-list'})
+            else:
+                field.required = True
+                field.widget.attrs.update({'class': 'form-control'})
+
+
+class ActivationForm(forms.ModelForm):
+    OPTIONAL_FIELDS = [
+        'witness_1_name',
+        'witness_1_phone',
+        'witness_1_id',
+        'witness_2_name',
+        'witness_2_phone',
+        'witness_2_id',
+    ]
+
+    class Meta:
+        model = Activation
+        exclude = ['patient']
+
+        widgets = {
+            'witness_1_phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'maxlength': '10',
+                'placeholder': 'اختياري - مثال: 0912345678',
+                'pattern': r'09[0-9]{8}',
+            }),
+            'witness_2_phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'maxlength': '10',
+                'placeholder': 'اختياري - مثال: 0912345678',
+                'pattern': r'09[0-9]{8}',
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field_name, field in self.fields.items():
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.required = False
+                field.widget.attrs.update({'class': 'form-check-input'})
             else:
                 field.widget.attrs.update({'class': 'form-control'})
 
-    def clean(self):
-        cleaned_data = super().clean()
-        decision = cleaned_data.get('decision')
-        decision_reason = cleaned_data.get('decision_reason')
+                if field_name in self.OPTIONAL_FIELDS:
+                    field.required = False
+                    field.widget.attrs.update({
+                        'placeholder': field.widget.attrs.get('placeholder', 'اختياري')
+                    })
+                else:
+                    field.required = True
 
-        if decision == 'REJECTED' and not (decision_reason or '').strip():
-            self.add_error('decision_reason', 'سبب رفض الإحالة مطلوب عند اختيار قرار الرفض.')
-        elif decision != 'REJECTED':
-            cleaned_data['decision_reason'] = ''
+    def clean_witness_1_phone(self):
+        phone = self.cleaned_data.get('witness_1_phone')
 
-        return cleaned_data
+        # الحقل اختياري، إذا تُرك فارغًا لا يظهر خطأ
+        if not phone:
+            return phone
 
-class PersonalQuestionnaireForm(forms.ModelForm):
-    class Meta:
-        model = PersonalQuestionnaire
-        exclude = ['patient', 'created_at']
-        widgets = {
-            'service_start_date': forms.DateInput(attrs={'type': 'date'}),
-            'marital_details': forms.Textarea(attrs={'rows': 3}),
-            'participated_battles': forms.Textarea(attrs={'rows': 4}),
-            'injury_circumstances': forms.Textarea(attrs={'rows': 4}),
-            'previous_injuries': forms.Textarea(attrs={'rows': 3}),
-            'surgeries': forms.Textarea(attrs={'rows': 3}),
-            'chronic_diseases': forms.Textarea(attrs={'rows': 3}),
-            'current_medications': forms.Textarea(attrs={'rows': 3}),
-            'psychological_condition': forms.Textarea(attrs={'rows': 3}),
-            'rehabilitation_need': forms.Textarea(attrs={'rows': 3}),
-            'family_support': forms.Textarea(attrs={'rows': 3}),
-            'requested_support': forms.Textarea(attrs={'rows': 3}),
-            'additional_notes': forms.Textarea(attrs={'rows': 3}),
-        }
+        if not phone.isdigit():
+            raise forms.ValidationError('رقم الهاتف يجب أن يحتوي على أرقام فقط.')
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            field.widget.attrs.update({'class': 'form-control'})
+        if not phone.startswith('09'):
+            raise forms.ValidationError('رقم الهاتف يجب أن يبدأ بـ 09.')
+
+        if len(phone) != 10:
+            raise forms.ValidationError('رقم الهاتف يجب أن يتكوّن من 10 خانات فقط.')
+
+        return phone
+
+    def clean_witness_2_phone(self):
+        phone = self.cleaned_data.get('witness_2_phone')
+
+        # الحقل اختياري، إذا تُرك فارغًا لا يظهر خطأ
+        if not phone:
+            return phone
+
+        if not phone.isdigit():
+            raise forms.ValidationError('رقم الهاتف يجب أن يحتوي على أرقام فقط.')
+
+        if not phone.startswith('09'):
+            raise forms.ValidationError('رقم الهاتف يجب أن يبدأ بـ 09.')
+
+        if len(phone) != 10:
+            raise forms.ValidationError('رقم الهاتف يجب أن يتكوّن من 10 خانات فقط.')
+
+        return phone

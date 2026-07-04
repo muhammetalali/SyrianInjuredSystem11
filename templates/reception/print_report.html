@@ -1,0 +1,354 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>طباعة استمارة المصاب</title>
+
+    <style>
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            color: #000000;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        body {
+            width: 210mm;
+            min-height: 297mm;
+        }
+
+        .no-print {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .btn-print {
+            background: #062f28;
+            color: #ffffff;
+            padding: 8px 25px;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .print-container {
+            width: 190mm;
+            height: 277mm;
+            margin: 0 auto;
+            position: relative;
+            padding: 0;
+        }
+
+        .header-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8mm;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .header-right,
+        .header-left {
+            width: 34%;
+            line-height: 1.8;
+        }
+
+        .header-center {
+            width: 32%;
+            text-align: center;
+        }
+
+        .header-center img {
+            width: 22mm;
+            height: 22mm;
+            object-fit: contain;
+            margin-bottom: 2mm;
+        }
+
+        .main-title {
+            text-align: center;
+            font-size: 17px;
+            font-weight: bold;
+            margin: 4mm 0 6mm;
+            text-decoration: underline;
+        }
+
+        .top-checkboxes {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 6mm;
+        }
+
+        .top-checkboxes label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        input[type="checkbox"] {
+            width: 13px;
+            height: 13px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 5mm 0 3mm;
+        }
+
+        .box-section {
+            border: 1px solid #000;
+            border-radius: 5px;
+            padding: 4mm;
+            margin-bottom: 4mm;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 4mm;
+            margin-bottom: 4mm;
+            font-size: 12.5px;
+            font-weight: bold;
+        }
+
+        .field-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .field {
+            display: flex;
+            align-items: flex-end;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .field.large {
+            flex: 2;
+        }
+
+        .field-label {
+            white-space: nowrap;
+            margin-left: 2mm;
+        }
+
+        .field-value {
+            display: block;
+            flex: 1;
+            border-bottom: 1.5px dotted #000;
+            min-height: 6mm;
+        }
+
+        .signature-area {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 50mm;
+            display: flex;
+            justify-content: space-between;
+            gap: 10mm;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .signature-box {
+            width: 30%;
+        }
+
+        .signature-line {
+            height: 12mm;
+            border-bottom: 1.5px dotted #000;
+            margin-top: 5mm;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            html,
+            body {
+                width: 210mm;
+                height: 297mm;
+                overflow: hidden;
+            }
+
+            .print-container {
+                page-break-after: avoid;
+                page-break-before: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="no-print">
+    <button class="btn-print" onclick="window.print()">طباعة الاستمارة</button>
+    <br>
+    <a href="{% url 'reception:dashboard' %}" style="display:inline-block; margin-top:8px; color:#062f28;">
+        العودة للرئيسية
+    </a>
+</div>
+
+<div class="print-container">
+
+    <div class="header-grid">
+        <div class="header-right">
+            الجمهورية العربية السورية<br>
+            وزارة الدفاع<br>
+            مديرية شؤون الجرحى
+        </div>
+
+        <div class="header-center">
+            <img src="{% static 'reception/images/logo.jpg' %}" alt="الشعار">
+        </div>
+
+        <div class="header-left" style="text-align:left;">
+            التاريخ:
+            <span style="display:inline-block; width:35mm; border-bottom:1.5px dotted #000;"></span>
+            <br>
+            الرقم التسلسلي:
+            <span style="display:inline-block; width:35mm; border-bottom:1.5px dotted #000;"></span>
+        </div>
+    </div>
+
+    <div class="main-title">
+        استمارة المصاب
+    </div>
+
+    <div class="top-checkboxes">
+        <label>
+            <input type="checkbox" disabled>
+            تقييم طبي
+        </label>
+
+        <label>
+            <input type="checkbox" disabled>
+            مرسل وزارة
+        </label>
+
+        <label>
+            <input type="checkbox" disabled>
+            فصائل مندثرة
+        </label>
+    </div>
+
+    <div class="section-title">بيانات المصاب</div>
+
+    <div class="box-section">
+        <div class="field-row">
+            <div class="field large">
+                <span class="field-label">الاسم الثلاثي:</span>
+                <span class="field-value"></span>
+            </div>
+
+            <div class="field">
+                <span class="field-label">اللقب:</span>
+                <span class="field-value"></span>
+            </div>
+        </div>
+
+        <div class="field-row">
+            <div class="field">
+                <span class="field-label">رقم الهاتف:</span>
+                <span class="field-value"></span>
+            </div>
+
+            <div class="field">
+                <span class="field-label">الرقم الذاتي:</span>
+                <span class="field-value"></span>
+            </div>
+
+            <div class="field">
+                <span class="field-label">تاريخ الميلاد:</span>
+                <span class="field-value"></span>
+            </div>
+        </div>
+
+        <div class="field-row">
+            <div class="field">
+                <span class="field-label">الفصيل المندثر:</span>
+                <span class="field-value"></span>
+            </div>
+
+            <div class="field large">
+                <span class="field-label">السكن الحالي:</span>
+                <span class="field-value"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">قسم التقييم الطبي / معلومات الإصابة</div>
+
+    <div class="box-section">
+        <div class="field-row">
+            <div class="field">
+                <span class="field-label">تاريخ الإصابة:</span>
+                <span class="field-value"></span>
+            </div>
+
+            <div class="field">
+                <span class="field-label">نوع الإصابة:</span>
+                <span class="field-value"></span>
+            </div>
+        </div>
+
+        <div class="field-row">
+            <div class="field">
+                <span class="field-label">فئة الإصابة:</span>
+                <span class="field-value"></span>
+            </div>
+
+            <div class="field large">
+                <span class="field-label">تفاصيل الإصابة:</span>
+                <span class="field-value"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="signature-area">
+        <div class="signature-box">
+            الاسم
+            <div class="signature-line"></div>
+            التوقيع
+        </div>
+
+        <div class="signature-box">
+            الاسم
+            <div class="signature-line"></div>
+            التوقيع
+        </div>
+
+        <div class="signature-box">
+            الاسم
+            <div class="signature-line"></div>
+            التوقيع
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

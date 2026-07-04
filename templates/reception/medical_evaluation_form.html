@@ -1,123 +1,123 @@
 {% extends 'reception/base.html' %}
+
 {% block content %}
-<h2>المرحلة الثانية: التقييم الطبي</h2>
+<h2>التقييم الطبي</h2>
 
-<div class="report-box">
-    <strong>رقم التتبع التسلسلي: <span class="tracking-badge">{{ patient.tracking_number }}</span></strong><br><br>
-    <strong>بيانات المصاب:</strong><br>
-    الاسم: {{ patient.first_name }} {{ patient.last_name }} | الرقم الذاتي: {{ patient.national_id }}<br>
-    الحالة الصحية: {{ patient.health_condition }}
+<div class="report-box" style="margin-bottom:20px;">
+    <h3 style="color:#062f28;">بيانات الملف</h3>
+
+    <p><strong>رقم التتبع:</strong> {{ patient.tracking_number|default_if_none:"" }}</p>
+    <p><strong>الاسم الثلاثي:</strong> {{ patient.full_name|default_if_none:"" }}</p>
+    <p><strong>الرقم الذاتي:</strong> {{ patient.national_id|default_if_none:"" }}</p>
+    <p><strong>رقم الهاتف:</strong> {{ patient.phone|default_if_none:"" }}</p>
 </div>
 
-<div class="report-box">
-    <strong>الطبيب المسؤول الحالي:</strong> {{ request.user.get_full_name|default:request.user.username }}<br>
-    <em>سيتم إرفاق قرار اللجنة الطبية باسم حسابكم بشكل تلقائي عند الحفظ لمنع التلاعب.</em>
-</div>
-
-<form method="post">
+<form method="post" novalidate>
     {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="report-box" style="color:red;">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <h3 style="margin-bottom:15px; color:#062f28;">قسم التقييم الطبي / معلومات الإصابة</h3>
+
     <div class="form-grid">
-        {% for field in form %}
-            {% if field.name == 'decision_reason' %}
-                <div class="form-group conditional-field is-hidden" data-rejection-reason>
-                    <label>{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}<small style="color:red;">{{ field.errors }}</small>{% endif %}
-                </div>
-            {% elif field.name == 'committee_doctors' %}
-                <div class="form-group">
-                    <label>{{ field.label }}</label>
-                    <div class="field-actions">
-                        <button type="button" class="btn btn-small" data-select-all-doctors>تحديد الكل</button>
-                        <button type="button" class="btn btn-small btn-warning" data-clear-doctors>إلغاء التحديد</button>
-                    </div>
-                    <div class="doctor-choice-list" data-doctor-list>
-                        {% for doctor_option in field %}
-                            <label class="doctor-choice">
-                                {{ doctor_option.tag }}
-                                <span class="doctor-select-button">اختيار</span>
-                                <span class="doctor-choice-name">{{ doctor_option.choice_label }}</span>
-                            </label>
-                        {% empty %}
-                            <div class="report-box">
-                                لا توجد أسماء أطباء مضافة حالياً. تتم إضافة الأطباء من لوحة التحكم الإدارية.
-                            </div>
-                        {% endfor %}
-                    </div>
-                    {% if field.errors %}<small style="color:red;">{{ field.errors }}</small>{% endif %}
-                </div>
-            {% else %}
-                <div class="form-group">
-                    <label>{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}<small style="color:red;">{{ field.errors }}</small>{% endif %}
-                </div>
+        <div class="form-group">
+            <label>{{ form.injury_date.label }} <span style="color:red;">*</span></label>
+            {{ form.injury_date }}
+            {% if form.injury_date.errors %}
+                <small style="color:red;">{{ form.injury_date.errors }}</small>
             {% endif %}
-        {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.injury_type.label }} <span style="color:red;">*</span></label>
+            {{ form.injury_type }}
+            {% if form.injury_type.errors %}
+                <small style="color:red;">{{ form.injury_type.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.injury_category.label }} <span style="color:red;">*</span></label>
+            {{ form.injury_category }}
+            {% if form.injury_category.errors %}
+                <small style="color:red;">{{ form.injury_category.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group" style="grid-column:1 / -1;">
+            <label>{{ form.injury_details.label }} <span style="color:red;">*</span></label>
+            {{ form.injury_details }}
+            {% if form.injury_details.errors %}
+                <small style="color:red;">{{ form.injury_details.errors }}</small>
+            {% endif %}
+        </div>
     </div>
-    <button type="submit" class="btn">اعتماد قرار اللجنة الطبية</button>
+
+    <hr style="margin:25px 0;">
+
+    <h3 style="margin-bottom:15px; color:#062f28;">نتيجة التقييم الطبي</h3>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label>{{ form.considered_injury_type.label }} <span style="color:red;">*</span></label>
+            {{ form.considered_injury_type }}
+            {% if form.considered_injury_type.errors %}
+                <small style="color:red;">{{ form.considered_injury_type.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.considered_injury_category.label }} <span style="color:red;">*</span></label>
+            {{ form.considered_injury_category }}
+            {% if form.considered_injury_category.errors %}
+                <small style="color:red;">{{ form.considered_injury_category.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group" style="grid-column:1 / -1;">
+            <label>{{ form.cause_and_location.label }} <span style="color:red;">*</span></label>
+            {{ form.cause_and_location }}
+            {% if form.cause_and_location.errors %}
+                <small style="color:red;">{{ form.cause_and_location.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label style="font-weight:bold;">
+                {{ form.is_eligible.label }}
+                <span style="color:red;">*</span>
+            </label>
+
+            <div style="display:flex; gap:25px; align-items:center; margin-top:8px;">
+                {% for radio in form.is_eligible %}
+                    <label style="display:flex; align-items:center; gap:6px; font-weight:bold;">
+                        {{ radio.tag }}
+                        {{ radio.choice_label }}
+                    </label>
+                {% endfor %}
+            </div>
+
+            {% if form.is_eligible.errors %}
+                <small style="color:red;">{{ form.is_eligible.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.doctor_name.label }} <span style="color:red;">*</span></label>
+            {{ form.doctor_name }}
+            {% if form.doctor_name.errors %}
+                <small style="color:red;">{{ form.doctor_name.errors }}</small>
+            {% endif %}
+        </div>
+    </div>
+
+    <div style="margin-top:25px;">
+        <button type="submit" class="btn">اعتماد التقييم الطبي</button>
+        <a href="{% url 'reception:medical_queue' %}" class="btn">رجوع</a>
+    </div>
 </form>
-
-<script>
-    (function () {
-        const decisionField = document.getElementById('id_decision');
-        const reasonField = document.getElementById('id_decision_reason');
-        const reasonGroup = document.querySelector('[data-rejection-reason]');
-        const doctorInputs = document.querySelectorAll('input[name="committee_doctors"]');
-        const selectAllDoctorsButton = document.querySelector('[data-select-all-doctors]');
-        const clearDoctorsButton = document.querySelector('[data-clear-doctors]');
-
-        function syncDoctorButtons() {
-            doctorInputs.forEach(function (input) {
-                const button = input.parentElement.querySelector('.doctor-select-button');
-
-                if (button) {
-                    button.textContent = input.checked ? 'مختار' : 'اختيار';
-                }
-            });
-        }
-
-        function syncReasonRequirement() {
-            if (!decisionField || !reasonField || !reasonGroup) {
-                return;
-            }
-
-            const isRejected = decisionField.value === 'REJECTED';
-            reasonField.required = isRejected;
-            reasonGroup.classList.toggle('is-hidden', !isRejected);
-
-            if (!isRejected) {
-                reasonField.value = '';
-            }
-        }
-
-        if (decisionField) {
-            decisionField.addEventListener('change', syncReasonRequirement);
-            syncReasonRequirement();
-        }
-
-        if (selectAllDoctorsButton) {
-            selectAllDoctorsButton.addEventListener('click', function () {
-                doctorInputs.forEach(function (input) {
-                    input.checked = true;
-                });
-                syncDoctorButtons();
-            });
-        }
-
-        if (clearDoctorsButton) {
-            clearDoctorsButton.addEventListener('click', function () {
-                doctorInputs.forEach(function (input) {
-                    input.checked = false;
-                });
-                syncDoctorButtons();
-            });
-        }
-
-        doctorInputs.forEach(function (input) {
-            input.addEventListener('change', syncDoctorButtons);
-        });
-        syncDoctorButtons();
-    }());
-</script>
 {% endblock %}

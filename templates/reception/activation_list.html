@@ -1,7 +1,7 @@
 {% extends 'reception/base.html' %}
 
 {% block content %}
-<h2>قائمة الملفات المحولة إلى التقييم الطبي</h2>
+<h2>التفعيل</h2>
 
 <div class="table-responsive">
     <table>
@@ -11,7 +11,7 @@
                 <th>الاسم الثلاثي</th>
                 <th>الرقم الذاتي</th>
                 <th>رقم الهاتف</th>
-                <th>السكن الحالي</th>
+                <th>الحالة</th>
                 <th>الإجراء</th>
             </tr>
         </thead>
@@ -28,17 +28,17 @@
                 <td>{{ patient.full_name|default_if_none:"" }}</td>
                 <td>{{ patient.national_id|default_if_none:"" }}</td>
                 <td>{{ patient.phone|default_if_none:"" }}</td>
-                <td>{{ patient.current_residence|default_if_none:"" }}</td>
+                <td>{{ patient.get_status_display }}</td>
 
                 <td>
-                    <a class="btn" href="{% url 'reception:medical_evaluation_create' patient.id %}">
-                        التقييم الطبي
+                    <a class="btn" href="{% url 'reception:activation_create' patient.id %}">
+                        إدخال بيانات التفعيل
                     </a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6">لا توجد ملفات قيد التقييم حالياً.</td>
+                <td colspan="6">لا توجد ملفات جاهزة للتفعيل حالياً.</td>
             </tr>
             {% endfor %}
         </tbody>

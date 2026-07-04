@@ -1,35 +1,77 @@
 from django.contrib import admin
-from .models import CommitteeDoctor, Patient, MedicalEvaluation, PersonalQuestionnaire
-from .models import AuditLog
+from .models import Patient, MedicalEvaluation, Activation
+
 
 @admin.register(Patient)
 class PatientAdmin(admin.ModelAdmin):
-    list_display = ('tracking_number', 'first_name', 'last_name', 'national_id', 'status', 'created_at')
-    search_fields = ('tracking_number', 'national_id', 'military_number', 'first_name', 'last_name')
-    list_filter = ('status', 'created_at')
-    readonly_fields = ('tracking_number',)
+    list_display = (
+        'tracking_number',
+        'full_name',
+        'national_id',
+        'phone',
+        'status',
+        'created_at',
+    )
+
+    search_fields = (
+        'tracking_number',
+        'full_name',
+        'national_id',
+        'phone',
+    )
+
+    list_filter = (
+        'status',
+        'created_at',
+    )
+
+    readonly_fields = (
+        'tracking_number',
+        'created_at',
+    )
+
 
 @admin.register(MedicalEvaluation)
 class MedicalEvaluationAdmin(admin.ModelAdmin):
-    list_display = ('patient', 'doctor', 'decision', 'created_at')
-    list_filter = ('decision', 'created_at')
-    search_fields = ('patient__tracking_number', 'doctor__username', 'committee_doctors__full_name')
-    filter_horizontal = ('committee_doctors',)
+    list_display = (
+        'patient',
+        'is_eligible',
+        'doctor_name',
+        'created_at',
+    )
 
-@admin.register(PersonalQuestionnaire)
-class PersonalQuestionnaireAdmin(admin.ModelAdmin):
-    list_display = ('patient', 'current_residence', 'created_at')
-    search_fields = ('patient__tracking_number',)
+    search_fields = (
+        'patient__tracking_number',
+        'patient__full_name',
+        'doctor_name',
+        'injury_type',
+        'injury_category',
+    )
 
-@admin.register(CommitteeDoctor)
-class CommitteeDoctorAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'specialty', 'is_active', 'created_at')
-    list_filter = ('is_active', 'specialty')
-    search_fields = ('full_name', 'specialty')
+    list_filter = (
+        'is_eligible',
+        'created_at',
+    )
 
 
-@admin.register(AuditLog)
-class AuditLogAdmin(admin.ModelAdmin):
-    list_display = ('user', 'action', 'method', 'path', 'ip_address', 'created_at')
-    search_fields = ('user__username', 'action', 'path', 'ip_address')
-    list_filter = ('method', 'created_at')
+@admin.register(Activation)
+class ActivationAdmin(admin.ModelAdmin):
+    list_display = (
+        'patient',
+        'desired_work',
+        'is_mandatory',
+        'created_at',
+    )
+
+    search_fields = (
+        'patient__tracking_number',
+        'patient__full_name',
+        'desired_work',
+        'witness_1_name',
+        'witness_2_name',
+    )
+
+    list_filter = (
+        'is_mandatory',
+        'created_at',
+    )

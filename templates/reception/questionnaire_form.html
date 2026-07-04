@@ -1,29 +1,240 @@
 {% extends 'reception/base.html' %}
 
 {% block content %}
-<h2>المرحلة الثالثة: استمارة البيانات الشخصية والعسكرية</h2>
+<h2>التفعيل</h2>
 
-<div class="report-box">
-    يتم تعبئة هذه الاستمارة بعد قبول المصاب من اللجنة الطبية.
-    <br>
-    المصاب: <strong>{{ patient.first_name }} {{ patient.last_name }}</strong>
+<div class="report-box" style="margin-bottom:20px;">
+    <h3 style="color:#062f28;">استمارة البيانات الشخصية والعسكرية</h3>
+
+    <div class="table-responsive">
+        <table>
+            <tbody>
+                <tr>
+                    <th>رقم التتبع</th>
+                    <td>{{ patient.tracking_number|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>الاسم الثلاثي</th>
+                    <td>{{ patient.full_name|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>اللقب</th>
+                    <td>{{ patient.nickname|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>رقم الهاتف</th>
+                    <td>{{ patient.phone|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>الرقم الذاتي</th>
+                    <td>{{ patient.national_id|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>تاريخ الميلاد</th>
+                    <td>{{ patient.date_of_birth|date:"Y-m-d" }}</td>
+                </tr>
+
+                <tr>
+                    <th>الفصيل المندثر</th>
+                    <td>{{ patient.extinct_faction_name|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>السكن الحالي</th>
+                    <td>{{ patient.current_residence|default_if_none:"" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<form method="post">
+<div class="report-box" style="margin-bottom:20px;">
+    <h3 style="color:#062f28;">قسم التقييم الطبي / معلومات الإصابة</h3>
+
+    {% if medical_evaluation %}
+        <div class="table-responsive">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>تاريخ الإصابة</th>
+                        <td>{{ medical_evaluation.injury_date|date:"Y-m-d" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>نوع الإصابة</th>
+                        <td>{{ medical_evaluation.injury_type|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>فئة الإصابة</th>
+                        <td>{{ medical_evaluation.injury_category|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>تفاصيل الإصابة</th>
+                        <td>{{ medical_evaluation.injury_details|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>نوع الإصابة المعتبرة</th>
+                        <td>{{ medical_evaluation.considered_injury_type|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>فئة الإصابة المعتبرة</th>
+                        <td>{{ medical_evaluation.considered_injury_category|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>سبب ومكان الإصابة</th>
+                        <td>{{ medical_evaluation.cause_and_location|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>مستحق</th>
+                        <td>
+                            {% if medical_evaluation.is_eligible %}
+                                نعم
+                            {% else %}
+                                لا
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>اسم عضو اللجنة الطبية</th>
+                        <td>{{ medical_evaluation.doctor_name|default_if_none:"" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>لا يوجد تقييم طبي مسجل لهذا الملف.</p>
+    {% endif %}
+</div>
+
+<form method="post" novalidate>
     {% csrf_token %}
 
+    {% if form.non_field_errors %}
+        <div class="report-box" style="color:red;">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <h3 style="margin-bottom:15px; color:#062f28;">بيانات التفعيل</h3>
+
     <div class="form-grid">
-        {% for field in form %}
-            <div class="form-group">
-                <label>{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    <small style="color:red;">{{ field.errors }}</small>
-                {% endif %}
-            </div>
-        {% endfor %}
+        <div class="form-group">
+            <label>
+                {{ form.is_mandatory }}
+                {{ form.is_mandatory.label }}
+            </label>
+            {% if form.is_mandatory.errors %}
+                <small style="color:red;">{{ form.is_mandatory.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group" style="grid-column:1 / -1;">
+            <label>{{ form.desired_work.label }} <span style="color:red;">*</span></label>
+            {{ form.desired_work }}
+            {% if form.desired_work.errors %}
+                <small style="color:red;">{{ form.desired_work.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>
+                {{ form.witness_1_name.label }}
+                <small style="color:#666;">اختياري</small>
+            </label>
+            {{ form.witness_1_name }}
+            {% if form.witness_1_name.errors %}
+                <small style="color:red;">{{ form.witness_1_name.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>
+                {{ form.witness_1_phone.label }}
+                <small style="color:#666;">اختياري</small>
+            </label>
+            {{ form.witness_1_phone }}
+            {% if form.witness_1_phone.errors %}
+                <small style="color:red;">{{ form.witness_1_phone.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>
+                {{ form.witness_1_id.label }}
+                <small style="color:#666;">اختياري</small>
+            </label>
+            {{ form.witness_1_id }}
+            {% if form.witness_1_id.errors %}
+                <small style="color:red;">{{ form.witness_1_id.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>
+                {{ form.witness_2_name.label }}
+                <small style="color:#666;">اختياري</small>
+            </label>
+            {{ form.witness_2_name }}
+            {% if form.witness_2_name.errors %}
+                <small style="color:red;">{{ form.witness_2_name.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>
+                {{ form.witness_2_phone.label }}
+                <small style="color:#666;">اختياري</small>
+            </label>
+            {{ form.witness_2_phone }}
+            {% if form.witness_2_phone.errors %}
+                <small style="color:red;">{{ form.witness_2_phone.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>
+                {{ form.witness_2_id.label }}
+                <small style="color:#666;">اختياري</small>
+            </label>
+            {{ form.witness_2_id }}
+            {% if form.witness_2_id.errors %}
+                <small style="color:red;">{{ form.witness_2_id.errors }}</small>
+            {% endif %}
+        </div>
     </div>
 
-    <button type="submit" class="btn">حفظ الاستمارة</button>
+    <div style="margin-top:25px;">
+        <button type="submit" class="btn">حفظ التفعيل وإرساله إلى قائمة المقبولين</button>
+        <a href="{% url 'reception:activation_list' %}" class="btn">رجوع</a>
+    </div>
 </form>
+
+<script>
+    (function () {
+        const phoneInputs = [
+            document.getElementById('id_witness_1_phone'),
+            document.getElementById('id_witness_2_phone')
+        ];
+
+        phoneInputs.forEach(function (input) {
+            if (input) {
+                input.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+                });
+            }
+        });
+    }());
+</script>
 {% endblock %}

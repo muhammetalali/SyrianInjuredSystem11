@@ -1,34 +1,25 @@
 {% extends 'reception/base.html' %}
 
 {% block content %}
-<h2>لوحة المتابعة الرئيسية</h2>
+<h2>لوحة التحكم</h2>
 
-<div class="cards">
+<div class="dashboard-cards">
     <div class="card">
-        <strong>{{ under_review_count }}</strong>
-        قيد التقييم الطبي
+        <h3>قيد التقييم الطبي</h3>
+        <p>{{ under_review_count }}</p>
+        <a class="btn" href="{% url 'reception:medical_queue' %}">عرض الملفات</a>
     </div>
 
     <div class="card">
-        <strong>{{ accepted_count }}</strong>
-        مقبول
+        <h3>قيد التفعيل</h3>
+        <p>{{ ready_for_activation_count }}</p>
+        <a class="btn" href="{% url 'reception:activation_list' %}">عرض التفعيل</a>
     </div>
 
     <div class="card">
-        <strong>{{ suspended_count }}</strong>
-        معلق
-    </div>
-
-    <div class="card">
-        <strong>{{ rejected_count }}</strong>
-        مرفوض
-    </div>
-
-    <div class="card">
-        <strong>{{ completed_count }}</strong>
-        مكتمل الاستمارة
+        <h3>المقبولون</h3>
+        <p>{{ accepted_count }}</p>
+        <a class="btn" href="{% url 'reception:accepted_list' %}">عرض المقبولين</a>
     </div>
 </div>
-
-<a class="btn" href="{% url 'reception:intake_create' %}">إدخال مصاب جديد</a>
 {% endblock %}

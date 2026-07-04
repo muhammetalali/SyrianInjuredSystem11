@@ -1,73 +1,195 @@
 {% extends 'reception/base.html' %}
 
 {% block content %}
-<h2>تفاصيل ملف المصاب</h2>
+<h2>الاطلاع على البيانات</h2>
 
-<div class="report-box">
-    <strong>الاسم:</strong> {{ patient.first_name }} {{ patient.last_name }}<br>
-    <strong>اسم الأب:</strong> {{ patient.father_name }}<br>
-    <strong>الرقم الذاتي:</strong> {{ patient.national_id }}<br>
-    <strong>الرقم العسكري:</strong> {{ patient.military_number }}<br>
-    <strong>الرتبة:</strong> {{ patient.rank }}<br>
-    <strong>الوحدة العسكرية:</strong> {{ patient.military_unit }}<br>
-    <strong>الوضع الاجتماعي:</strong> {{ patient.get_social_status_display }}<br>
-    {% if patient.social_status == 'married' %}
-        <strong>عدد الأطفال:</strong> {{ patient.children_count }}<br>
-    {% endif %}
-    <strong>الحالة:</strong> {{ patient.get_status_display }}<br>
-    <strong>الحالة الصحية:</strong> {{ patient.health_condition }}<br>
+<div class="report-box" style="margin-bottom:20px;">
+    <h3 style="color:#062f28;">استمارة البيانات الشخصية والعسكرية</h3>
+
+    <div class="table-responsive">
+        <table>
+            <tbody>
+                <tr>
+                    <th>رقم التتبع</th>
+                    <td>{{ patient.tracking_number|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>الاسم الثلاثي</th>
+                    <td>{{ patient.full_name|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>اللقب</th>
+                    <td>{{ patient.nickname|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>رقم الهاتف</th>
+                    <td>{{ patient.phone|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>الرقم الذاتي</th>
+                    <td>{{ patient.national_id|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>تاريخ الميلاد</th>
+                    <td>{{ patient.date_of_birth|date:"Y-m-d" }}</td>
+                </tr>
+
+                <tr>
+                    <th>الفصيل المندثر</th>
+                    <td>{{ patient.extinct_faction_name|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>السكن الحالي</th>
+                    <td>{{ patient.current_residence|default_if_none:"" }}</td>
+                </tr>
+
+                <tr>
+                    <th>حالة الملف</th>
+                    <td>{{ patient.get_status_display }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<h2>الوثائق والصور</h2>
-<div class="report-box">
-    <strong>البطاقة الشخصية:</strong> {{ patient.has_identity_card|yesno:"موجودة,غير موجودة" }}
-    {% if patient.identity_card_image %} | <a href="{{ patient.identity_card_image.url }}" target="_blank">عرض الصورة</a>{% endif %}<br>
-    <strong>البطاقة العسكرية:</strong> {{ patient.has_military_card|yesno:"موجودة,غير موجودة" }}
-    {% if patient.military_card_image %} | <a href="{{ patient.military_card_image.url }}" target="_blank">عرض الصورة</a>{% endif %}<br>
-    <strong>التقرير الطبي:</strong> {{ patient.has_medical_report|yesno:"موجود,غير موجود" }}
-    {% if patient.medical_report_image %} | <a href="{{ patient.medical_report_image.url }}" target="_blank">عرض الصورة</a>{% endif %}<br>
-    <strong>وثيقة الإصابة:</strong> {{ patient.has_injury_document|yesno:"موجودة,غير موجودة" }}
-    {% if patient.injury_document_image %} | <a href="{{ patient.injury_document_image.url }}" target="_blank">عرض الصورة</a>{% endif %}
-</div>
+<div class="report-box" style="margin-bottom:20px;">
+    <h3 style="color:#062f28;">قسم التقييم الطبي / معلومات الإصابة</h3>
 
-{% if patient.medical_evaluation %}
-<h2>قرار اللجنة الطبية</h2>
+    {% if medical_evaluation %}
+        <div class="table-responsive">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>تاريخ الإصابة</th>
+                        <td>{{ medical_evaluation.injury_date|date:"Y-m-d" }}</td>
+                    </tr>
 
-<div class="report-box">
-    {{ patient.medical_evaluation.decision_report }}
-</div>
+                    <tr>
+                        <th>نوع الإصابة</th>
+                        <td>{{ medical_evaluation.injury_type|default_if_none:"" }}</td>
+                    </tr>
 
-<div class="report-box">
-    <strong>الطبيب المسؤول:</strong>
-    {% if patient.medical_evaluation.doctor %}
-        {{ patient.medical_evaluation.doctor.get_full_name|default:patient.medical_evaluation.doctor.username }}
+                    <tr>
+                        <th>فئة الإصابة</th>
+                        <td>{{ medical_evaluation.injury_category|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>تفاصيل الإصابة</th>
+                        <td>{{ medical_evaluation.injury_details|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>نوع الإصابة المعتبرة</th>
+                        <td>{{ medical_evaluation.considered_injury_type|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>فئة الإصابة المعتبرة</th>
+                        <td>{{ medical_evaluation.considered_injury_category|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>سبب ومكان الإصابة</th>
+                        <td>{{ medical_evaluation.cause_and_location|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>مستحق</th>
+                        <td>
+                            {% if medical_evaluation.is_eligible %}
+                                نعم
+                            {% else %}
+                                لا
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>اسم عضو اللجنة الطبية</th>
+                        <td>{{ medical_evaluation.doctor_name|default_if_none:"" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     {% else %}
-        غير محدد
-    {% endif %}<br>
-    <strong>الأطباء الحاضرون:</strong>
-    {% for doctor in patient.medical_evaluation.committee_doctors.all %}
-        {{ doctor }}{% if not forloop.last %}، {% endif %}
-    {% empty %}
-        {{ patient.medical_evaluation.committee_members|default:"غير محدد" }}
-    {% endfor %}<br>
-    <strong>التشخيص:</strong> {{ patient.medical_evaluation.diagnosis }}<br>
-    <strong>درجة الإصابة:</strong> {{ patient.medical_evaluation.get_injury_degree_display }}<br>
-    <strong>قرار اللجنة:</strong> {{ patient.medical_evaluation.get_decision_display }}<br>
-    <strong>سبب القرار:</strong> {{ patient.medical_evaluation.decision_reason|default:"غير محدد" }}<br>
+        <p>لا يوجد تقييم طبي مسجل لهذا الملف.</p>
+    {% endif %}
 </div>
-{% endif %}
 
-{% if patient.questionnaire %}
-<h2>استمارة البيانات الشخصية</h2>
+<div class="report-box" style="margin-bottom:20px;">
+    <h3 style="color:#062f28;">بيانات التفعيل</h3>
 
-<div class="report-box">
-    <strong>الإقامة الحالية:</strong> {{ patient.questionnaire.current_residence }}<br>
-    <strong>المستوى التعليمي:</strong> {{ patient.questionnaire.education_level }}<br>
-    <strong>المعارك أو المهام:</strong> {{ patient.questionnaire.participated_battles }}<br>
-    <strong>ظروف الإصابة:</strong> {{ patient.questionnaire.injury_circumstances }}<br>
-    <strong>نوع الدعم المطلوب:</strong> {{ patient.questionnaire.requested_support }}<br>
+    {% if activation %}
+        <div class="table-responsive">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>تفعيل إلزامي</th>
+                        <td>
+                            {% if activation.is_mandatory %}
+                                نعم
+                            {% else %}
+                                لا
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>العمل الذي ترغب به</th>
+                        <td>{{ activation.desired_work|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>اسم الشاهد الأول</th>
+                        <td>{{ activation.witness_1_name|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>رقم هاتف الشاهد الأول</th>
+                        <td>{{ activation.witness_1_phone|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>الرقم الذاتي للشاهد الأول</th>
+                        <td>{{ activation.witness_1_id|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>اسم الشاهد الثاني</th>
+                        <td>{{ activation.witness_2_name|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>رقم هاتف الشاهد الثاني</th>
+                        <td>{{ activation.witness_2_phone|default_if_none:"" }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>الرقم الذاتي للشاهد الثاني</th>
+                        <td>{{ activation.witness_2_id|default_if_none:"" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>لا توجد بيانات تفعيل مسجلة لهذا الملف.</p>
+    {% endif %}
 </div>
-{% endif %}
 
-<a class="btn btn-secondary" href="{% url 'reception:dashboard' %}">عودة للرئيسية</a>
+<div style="margin-top:25px;">
+    <a class="btn" href="{% url 'reception:accepted_list' %}">
+        رجوع إلى قائمة المقبولين
+    </a>
+
+    <a class="btn" href="{% url 'reception:print_report' patient.id %}">
+        الطباعة
+    </a>
+</div>
 {% endblock %}

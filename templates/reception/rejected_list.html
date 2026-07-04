@@ -19,7 +19,7 @@
             <td>{{ patient.national_id }}</td>
             <td>{{ patient.military_number }}</td>
             <td>
-                <a class="btn btn-danger" href="{% url 'reception:patient_detail' patient.id %}">
+                <a class="btn" href="{% url 'reception:print_report' patient.id %}">عرض وطباعة</a>
                     عرض الملف
                 </a>
             </td>
