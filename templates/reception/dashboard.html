@@ -5,13 +5,13 @@
 
 <div class="dashboard-cards">
     <div class="card">
-        <h3>قيد التقييم الطبي</h3>
+        <h3> التقييم الطبي</h3>
         <p>{{ under_review_count }}</p>
         <a class="btn" href="{% url 'reception:medical_queue' %}">عرض الملفات</a>
     </div>
 
     <div class="card">
-        <h3>قيد التفعيل</h3>
+        <h3> التحقق</h3>
         <p>{{ ready_for_activation_count }}</p>
         <a class="btn" href="{% url 'reception:activation_list' %}">عرض التفعيل</a>
     </div>
