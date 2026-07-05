@@ -1,6 +1,8 @@
 from django.contrib import admin
 from .models import Patient, MedicalEvaluation, Activation
+from .models import Doctor
 
+admin.site.register(Doctor)
 
 @admin.register(Patient)
 class PatientAdmin(admin.ModelAdmin):
