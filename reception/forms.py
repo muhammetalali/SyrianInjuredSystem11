@@ -1,5 +1,5 @@
 from django import forms
-from .models import Patient, MedicalEvaluation, Activation
+from .models import Patient, MedicalEvaluation, Activation, Doctor
 
 
 class PatientIntakeForm(forms.ModelForm):
@@ -96,10 +96,16 @@ class MedicalEvaluationForm(forms.ModelForm):
                 'class': 'form-control',
                 'rows': 4,
             }),
+            'doctor_name': forms.Select(attrs={
+                'class': 'form-control',
+            }),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # إضافة نص افتراضي للقائمة المنسدلة للأطباء
+        self.fields['doctor_name'].empty_label = "--- اختر اسم عضو اللجنة ---"
 
         for field_name, field in self.fields.items():
             if isinstance(field.widget, forms.CheckboxInput):
@@ -162,7 +168,6 @@ class ActivationForm(forms.ModelForm):
     def clean_witness_1_phone(self):
         phone = self.cleaned_data.get('witness_1_phone')
 
-        # الحقل اختياري، إذا تُرك فارغًا لا يظهر خطأ
         if not phone:
             return phone
 
@@ -180,7 +185,6 @@ class ActivationForm(forms.ModelForm):
     def clean_witness_2_phone(self):
         phone = self.cleaned_data.get('witness_2_phone')
 
-        # الحقل اختياري، إذا تُرك فارغًا لا يظهر خطأ
         if not phone:
             return phone
 
