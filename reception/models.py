@@ -7,6 +7,17 @@ phone_validator = RegexValidator(
     message='رقم الهاتف يجب أن يبدأ بـ 09 وأن يتكوّن من 10 خانات فقط.'
 )
 
+# 1. إضافة جدول جديد لأعضاء اللجنة الطبية
+class Doctor(models.Model):
+    name = models.CharField(
+        max_length=150, 
+        unique=True, 
+        verbose_name='اسم الطبيب / عضو اللجنة'
+    )
+
+    def __str__(self):
+        return self.name
+
 
 class Patient(models.Model):
     STATUS_CHOICES = [
@@ -165,10 +176,12 @@ class MedicalEvaluation(models.Model):
         verbose_name='مستحق'
     )
 
-    doctor_name = models.CharField(
-        max_length=150,
-        default='',
-        verbose_name='اسم عضو اللجنة الطبية'
+    # 2. تغيير هذا الحقل ليكون قائمة منسدلة مرتبطة بجدول الأطباء
+    doctor_name = models.ForeignKey(
+        Doctor,
+        on_delete=models.PROTECT,
+        verbose_name='اسم عضو اللجنة الطبية',
+        null=True
     )
 
     created_at = models.DateTimeField(
@@ -178,8 +191,6 @@ class MedicalEvaluation(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-
-        # سواء كان مستحق نعم أو لا، ينتقل الملف إلى التفعيل
         self.patient.status = 'READY_FOR_ACTIVATION'
         self.patient.save(update_fields=['status'])
 
@@ -258,8 +269,6 @@ class Activation(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-
-        # بعد حفظ التفعيل ينتقل الملف إلى قائمة المقبولين
         self.patient.status = 'ACCEPTED'
         self.patient.save(update_fields=['status'])
 
